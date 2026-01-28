@@ -13,7 +13,13 @@ export default function Home() {
   const [showLettera, setShowLettera] = useState(false);
   const [showRichiesta, setShowRichiesta] = useState(false);
   const [richiestaMessage, setRichiestaMessage] = useState("");
+  const [richiestaType, setRichiestaType] = useState<"richiesta" | "messaggio">("richiesta");
   const [hasFirstAccess, setHasFirstAccess] = useState(false);
+  const [showRegalino, setShowRegalino] = useState(false);
+  const [regalinoInput, setRegalinoInput] = useState("");
+  const [showMessaggioPersonalizzato, setShowMessaggioPersonalizzato] = useState(false);
+  const [messaggioPersonalizzatoInput, setMessaggioPersonalizzatoInput] = useState("");
+  const [showDisdetta, setShowDisdetta] = useState(false);
 
   // Controlla se ha già fatto il primo accesso
   useEffect(() => {
@@ -45,14 +51,13 @@ export default function Home() {
   };
 
   const whatsappMessages = [
-    { label: "Richiedi Bacino", message: "Roscetta Ordina: Damme 'nu vas, muovt." },
-    { label: "Richiedi Spupazzamento", message: "Roscetta Ordina: M'edde soffoca e vas strunz fa ambress." },
-    { label: "Richiedi Sushi", message: "Roscetta Ordina: Ammo teng famm. Ci sfondiamo all'All You Can Eat?" },
-    { label: "Richiedi Regalino", message: "Roscetta Ordina: Amo non puoi capire, ho visto [inserire regalo desiderato] in un negozio... bellissimo, peccato che non posso prenderlo... ora vedo un po' come fare, sarebbe bello se qualcuno a caso me lo regalasse... va beh prima o poi lo prenderò dai." },
-    { label: "Richiedi Chiamata Telefonica", message: "Roscetta Ordina: Chiamami zoccolo te vogl senti m manc." },
-    { label: "Richiedi Black Humor", message: "Roscetta Ordina: è tempo di offendere le minoranze." },
+    { label: "Richiedi Bacino", message: "Damme 'nu vas, muovt." },
+    { label: "Richiedi Spupazzamento", message: "M'edde soffoca e vas strunz fa ambress." },
+    { label: "Richiedi Sushi", message: "Ammo teng famm. Ci sfondiamo all'All You Can Eat?" },
+    { label: "Richiedi Chiamata Telefonica", message: "Chiamami zoccolo te vogl senti m manc." },
+    { label: "Richiedi Black Humor", message: "È tempo di offendere le minoranze." },
     { label: "Richiedi Complimento", message: "L'autostima di Roscetta è al di sotto del 20%. Collegare all'alimentazione di complimenti il prima possibile." },
-    { label: "Chiedi Se Sono Tuo", message: "Roscetta vuole sapere: Sij o mij?" },
+    { label: "Chiedi Se Sono Tuo", message: "Sij o mij?" },
     { label: "Segnala Bug", message: "Devi dirmi qualcosa? Ah fai finta di nulla... LO SAI COSA HAI FATTO!!" },
   ];
 
@@ -71,6 +76,28 @@ export default function Home() {
   const inviaRichiesta = (message: string) => {
     sendNotification(message);
     setRichiestaMessage(message);
+    setRichiestaType("richiesta");
+    setShowRichiesta(true);
+  };
+
+  const inviaRegalino = () => {
+    if (!regalinoInput.trim()) return;
+    const message = `Amo non puoi capire, ho visto ${regalinoInput} in un negozio... bellissimo, peccato che non posso prenderlo... ora vedo un po' come fare, sarebbe bello se qualcuno a caso me lo regalasse... va beh prima o poi lo prenderò dai.`;
+    sendNotification(message);
+    setRichiestaMessage(message);
+    setRichiestaType("richiesta");
+    setShowRegalino(false);
+    setRegalinoInput("");
+    setShowRichiesta(true);
+  };
+
+  const inviaMessaggioPersonalizzato = () => {
+    if (!messaggioPersonalizzatoInput.trim()) return;
+    sendNotification(messaggioPersonalizzatoInput);
+    setRichiestaMessage(messaggioPersonalizzatoInput);
+    setRichiestaType("messaggio");
+    setShowMessaggioPersonalizzato(false);
+    setMessaggioPersonalizzatoInput("");
     setShowRichiesta(true);
   };
 
@@ -98,14 +125,16 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // Genera stelle casuali per lo sfondo (limitato a 98% per evitare scroll)
-  const stars = Array.from({ length: 100 }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 98}%`,
-    top: `${Math.random() * 98}%`,
-    size: Math.random() * 3 + 1,
-    delay: Math.random() * 3,
-  }));
+  // Genera stelle casuali per lo sfondo (ridotto per performance)
+  const [stars] = useState(() =>
+    Array.from({ length: 50 }, (_, i) => ({
+      id: i,
+      left: `${Math.random() * 98}%`,
+      top: `${Math.random() * 98}%`,
+      size: Math.random() * 3 + 1,
+      delay: Math.random() * 3,
+    }))
+  );
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-[#0a0a1a] via-[#1a1a2e] to-[#0a0a1a]">
@@ -278,6 +307,143 @@ export default function Home() {
         </div>
       )}
 
+      {/* Popup Conferma Disdetta */}
+      {showDisdetta && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur-sm popup-backdrop-enter">
+          <div className="relative bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border border-red-500/30 rounded-2xl p-8 max-w-md mx-4 shadow-2xl shadow-red-500/20 popup-enter">
+            {/* Icona */}
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center">
+                <span className="text-4xl">💔</span>
+              </div>
+            </div>
+
+            {/* Titolo */}
+            <h2 className="text-2xl font-bold text-red-400 text-center mb-4">
+              Sei sicura?
+            </h2>
+
+            {/* Messaggio */}
+            <p className="text-purple-200/80 text-center mb-6">
+              Così facendo non potrai più ricevere i benefici di <span className="font-bold text-pink-400">Ricciolino Prime</span> e spezzerai il suo cuoricino in mille frantumi.
+            </p>
+
+            {/* Pulsanti */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  sendNotification("Fra che cazzo hai combinato? Stavolta ti è andata bene ma Roscetta stava per lasciarti ed è molto probabile che ti stia per staccare le palle. Mantieni un profilo basso per i prossimi giorni.");
+                  setShowDisdetta(false);
+                }}
+                className="w-full px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full text-white font-semibold hover:scale-105 transition-all duration-300 shadow-lg shadow-pink-500/30 cursor-pointer"
+              >
+                No, voglio restare con il Ricciolino
+              </button>
+              <button
+                onClick={() => {
+                  setShowDisdetta(false);
+                  inviaRichiesta("Amo dobbiamo parlare... non sei tu davvero, sono io...");
+                }}
+                className="w-full px-6 py-3 bg-transparent border border-red-500/50 rounded-full text-red-400 font-semibold hover:bg-red-500/10 transition-all duration-300 cursor-pointer text-sm"
+              >
+                Sì, sono una persona senza cuore e desidero lasciare il Ricciolino
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Popup Messaggio Personalizzato */}
+      {showMessaggioPersonalizzato && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur-sm popup-backdrop-enter">
+          <div className="relative bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border border-pink-500/30 rounded-2xl p-8 max-w-md mx-4 shadow-2xl shadow-pink-500/20 popup-enter">
+            {/* Icona */}
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-pink-500/20 flex items-center justify-center">
+                <span className="text-4xl">✉️</span>
+              </div>
+            </div>
+
+            {/* Titolo */}
+            <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-purple-400 text-center mb-4">
+              Scrivi il tuo messaggio
+            </h2>
+
+            {/* Textarea */}
+            <textarea
+              value={messaggioPersonalizzatoInput}
+              onChange={(e) => setMessaggioPersonalizzatoInput(e.target.value)}
+              placeholder="Scrivi qui il tuo messaggio..."
+              rows={4}
+              className="w-full px-4 py-3 rounded-xl bg-purple-900/50 border border-purple-500/30 text-white placeholder-purple-400/50 focus:outline-none focus:border-pink-500 mb-6 resize-none"
+            />
+
+            {/* Pulsanti */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowMessaggioPersonalizzato(false); setMessaggioPersonalizzatoInput(""); }}
+                className="flex-1 px-6 py-3 bg-purple-900/50 border border-purple-500/30 rounded-full text-purple-300 font-semibold hover:bg-purple-900/70 transition-all duration-300 cursor-pointer"
+              >
+                Annulla
+              </button>
+              <button
+                onClick={inviaMessaggioPersonalizzato}
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full text-white font-semibold hover:scale-105 transition-all duration-300 shadow-lg shadow-pink-500/30 cursor-pointer"
+              >
+                Invia
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Popup Regalino */}
+      {showRegalino && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur-sm popup-backdrop-enter">
+          <div className="relative bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border border-pink-500/30 rounded-2xl p-8 max-w-md mx-4 shadow-2xl shadow-pink-500/20 popup-enter">
+            {/* Icona regalo */}
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-pink-500/20 flex items-center justify-center">
+                <span className="text-4xl">🎁</span>
+              </div>
+            </div>
+
+            {/* Titolo */}
+            <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-purple-400 text-center mb-4">
+              Cosa vorresti ricevere?
+            </h2>
+
+            {/* Input */}
+            <input
+              type="text"
+              value={regalinoInput}
+              onChange={(e) => setRegalinoInput(e.target.value)}
+              placeholder="Es: una borsa Gucci, un iPhone..."
+              className="w-full px-4 py-3 rounded-xl bg-purple-900/50 border border-purple-500/30 text-white placeholder-purple-400/50 focus:outline-none focus:border-pink-500 mb-2"
+            />
+            <p className="text-xs text-purple-300/50 mb-6">
+              * Ricordati che sono povero come Jeff Bezos dopo aver acquistato un kilo di castagne.
+            </p>
+
+            {/* Pulsanti */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowRegalino(false); setRegalinoInput(""); }}
+                className="flex-1 px-6 py-3 bg-purple-900/50 border border-purple-500/30 rounded-full text-purple-300 font-semibold hover:bg-purple-900/70 transition-all duration-300 cursor-pointer"
+              >
+                Annulla
+              </button>
+              <button
+                onClick={inviaRegalino}
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full text-white font-semibold hover:scale-105 transition-all duration-300 shadow-lg shadow-pink-500/30 cursor-pointer"
+              >
+                Invia
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Popup Richiesta Inviata */}
       {showRichiesta && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur-sm popup-backdrop-enter">
@@ -291,12 +457,14 @@ export default function Home() {
 
             {/* Titolo */}
             <h2 className="text-2xl font-bold text-green-400 text-center mb-4">
-              Richiesta inviata!
+              {richiestaType === "messaggio" ? "Messaggio inviato!" : "Richiesta inviata!"}
             </h2>
 
             {/* Messaggio */}
             <div className="bg-purple-900/30 rounded-xl p-4 mb-6">
-              <p className="text-purple-300/60 text-sm mb-2">Testo della richiesta:</p>
+              <p className="text-purple-300/60 text-sm mb-2">
+                {richiestaType === "messaggio" ? "Testo del messaggio:" : "Testo della richiesta:"}
+              </p>
               <p className="text-purple-200 italic">{richiestaMessage}</p>
             </div>
 
@@ -446,9 +614,27 @@ export default function Home() {
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {whatsappMessages.map((item, index) => (
+                {/* Prima parte: Bacino, Spupazzamento, Sushi */}
+                {whatsappMessages.slice(0, 3).map((item, index) => (
                   <button
                     key={index}
+                    onClick={() => inviaRichiesta(item.message)}
+                    className="px-4 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:shadow-lg hover:shadow-purple-500/30 cursor-pointer"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+                {/* Pulsante Regalino - apre popup con input */}
+                <button
+                  onClick={() => setShowRegalino(true)}
+                  className="px-4 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:shadow-lg hover:shadow-purple-500/30 cursor-pointer"
+                >
+                  Richiedi Regalino
+                </button>
+                {/* Resto dei pulsanti */}
+                {whatsappMessages.slice(3).map((item, index) => (
+                  <button
+                    key={index + 3}
                     onClick={() => inviaRichiesta(item.message)}
                     className="px-4 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:shadow-lg hover:shadow-purple-500/30 cursor-pointer"
                   >
@@ -461,6 +647,13 @@ export default function Home() {
                   className="px-4 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:shadow-lg hover:shadow-purple-500/30 cursor-pointer"
                 >
                   Chiedi Scusa
+                </button>
+                {/* Pulsante Messaggio Personalizzato - larghezza piena */}
+                <button
+                  onClick={() => setShowMessaggioPersonalizzato(true)}
+                  className="col-span-1 sm:col-span-2 px-4 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:shadow-lg hover:shadow-purple-500/30 cursor-pointer"
+                >
+                  Messaggio Personalizzato
                 </button>
                 {/* Pulsante Emergenza - dentro il box ma più grande */}
                 <div className="col-span-1 sm:col-span-2 flex flex-col items-center gap-3 mt-4">
@@ -483,7 +676,7 @@ export default function Home() {
 
             {/* Disdici abbonamento - fuori dal box */}
             <button
-              onClick={() => inviaRichiesta("Amo dobbiamo parlare... non sei tu davvero, sono io...")}
+              onClick={() => setShowDisdetta(true)}
               className="mt-6 px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r from-red-600 to-red-800 text-white hover:shadow-lg hover:shadow-red-500/30 cursor-pointer"
             >
               Disdici abbonamento Ricciolino Prime
