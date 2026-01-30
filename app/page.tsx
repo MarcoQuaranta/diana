@@ -324,31 +324,34 @@ export default function Home() {
 
         {/* Globo che gira */}
         <div className="globe-container">
-          <div className="globe relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-purple-500/30">
+          <div className="globe relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full border-4 border-purple-500/30">
+            {/* Contenitore foto con overflow hidden */}
+            <div className="absolute inset-0 rounded-full overflow-hidden">
+              {/* Foto  */}
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 via-pink-800 to-purple-900">
+                {/* Foto principale */}
+                <Image
+                  src="/images/galleria/1.webp"
+                  alt="La nostra foto"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+                {/* Foto sovrapposta */}
+                <Image
+                  src="/foto.jpg"
+                  alt=""
+                  fill
+                  className="object-cover opacity-20"
+                />
+              </div>
+            </div>
+
             {/* Gradiente overlay per effetto sferico */}
             <div className="absolute inset-0 z-10 rounded-full bg-gradient-to-br from-white/20 via-transparent to-black/40 pointer-events-none" />
 
             {/* Riflesso luce */}
             <div className="absolute top-4 left-8 w-16 h-16 md:w-20 md:h-20 bg-white/30 rounded-full blur-xl z-20 pointer-events-none" />
-
-            {/* Foto  */}
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 via-pink-800 to-purple-900">
-              {/* Foto principale */}
-              <Image
-                src="/images/galleria/1.webp"
-                alt="La nostra foto"
-                fill
-                className="object-cover"
-                priority
-              />
-              {/* Foto sovrapposta */}
-              <Image
-                src="/foto.jpg"
-                alt=""
-                fill
-                className="object-cover opacity-20"
-              />
-            </div>
           </div>
         </div>
 
