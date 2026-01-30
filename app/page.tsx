@@ -326,8 +326,8 @@ export default function Home() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-[#0a0a1a] via-[#1a1a2e] to-[#0a0a1a]">
-      {/* Stelle di sfondo */}
-      {stars.map((star) => (
+      {/* Stelle di sfondo - limitate per performance */}
+      {stars.slice(0, 25).map((star) => (
         <div
           key={star.id}
           className="star absolute rounded-full bg-white"
@@ -337,6 +337,7 @@ export default function Home() {
             width: `${star.size}px`,
             height: `${star.size}px`,
             animationDelay: `${star.delay}s`,
+            contain: 'strict',
           }}
         />
       ))}
@@ -867,18 +868,19 @@ export default function Home() {
           </div>
 
           {/* Griglia foto scrollabile */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto scroll-container">
             <div className="grid grid-cols-2 gap-2 p-2 pb-8 max-w-lg mx-auto">
               {galleryPhotos.map((photo, index) => (
                 <div
                   key={index}
                   onClick={() => setEnlargedPhoto(photo)}
-                  className="relative aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity border border-purple-500/20 hover:border-pink-500/50"
+                  className="relative aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity border border-purple-500/20 hover:border-pink-500/50 contain-paint"
                 >
                   <Image
                     src={photo}
                     alt={`Foto ${index + 1}`}
                     fill
+                    loading="lazy"
                     className="object-cover"
                   />
                 </div>
@@ -1047,9 +1049,9 @@ export default function Home() {
 
       {/* Pagina Ricciolino Prime */}
       {showPrime && (
-        <div className="fixed inset-0 z-50 bg-gradient-to-b from-[#0a0a1a] via-[#1a1a2e] to-[#0a0a1a] overflow-x-hidden overflow-y-auto">
-          {/* Stelle di sfondo */}
-          {stars.map((star) => (
+        <div className="fixed inset-0 z-50 bg-gradient-to-b from-[#0a0a1a] via-[#1a1a2e] to-[#0a0a1a] overflow-x-hidden overflow-y-auto scroll-container">
+          {/* Stelle di sfondo - limitate per performance */}
+          {stars.slice(0, 25).map((star) => (
             <div
               key={`prime-${star.id}`}
               className="star absolute rounded-full bg-white"
@@ -1059,6 +1061,7 @@ export default function Home() {
                 width: `${star.size}px`,
                 height: `${star.size}px`,
                 animationDelay: `${star.delay}s`,
+                contain: 'strict',
               }}
             />
           ))}

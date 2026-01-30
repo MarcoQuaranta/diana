@@ -16,6 +16,18 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Performance optimizations */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* GPU acceleration per elementi animati */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 /* Animazione rotazione globo */
@@ -51,15 +63,21 @@ body {
 .globe-container {
   perspective: 1000px;
   transform-style: preserve-3d;
+  contain: layout style paint;
 }
 
 .globe {
   animation: spin-globe 8s linear infinite, pulse-glow 4s ease-in-out infinite;
   transform-style: preserve-3d;
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .star {
   animation: twinkle 3s ease-in-out infinite;
+  will-change: opacity;
+  contain: strict;
 }
 
 /* Animazioni popup */
@@ -105,10 +123,12 @@ body {
 
 .popup-enter {
   animation: popup-enter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  will-change: transform, opacity;
 }
 
 .popup-exit {
   animation: popup-exit 0.3s ease-out forwards;
+  will-change: transform, opacity;
 }
 
 /* Animazione moneta - rotazione lenta continua */
@@ -158,4 +178,26 @@ body {
 
 .gallery-slide {
   animation: gallerySlide 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  will-change: transform, opacity;
+}
+
+/* Ottimizzazione scroll */
+.scroll-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+/* Contenimento per elementi pesanti */
+.contain-paint {
+  contain: paint;
+}
+
+/* Riduzione backdrop-blur su mobile per performance */
+@media (max-width: 768px) {
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px) !important;
+  }
 }
