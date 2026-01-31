@@ -20,6 +20,7 @@ export default function Home() {
   const [showMessaggioPersonalizzato, setShowMessaggioPersonalizzato] = useState(false);
   const [messaggioPersonalizzatoInput, setMessaggioPersonalizzatoInput] = useState("");
   const [showDisdetta, setShowDisdetta] = useState(false);
+  const [isDisdettaPending, setIsDisdettaPending] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
   const [showFullGallery, setShowFullGallery] = useState(false);
@@ -666,11 +667,9 @@ export default function Home() {
               </button>
               <button
                 onClick={() => {
-                  sendNotification("Amo dobbiamo parlare... non sei tu davvero, sono io...");
-                  localStorage.removeItem('ricciolinoPrimeAccess');
-                  setHasFirstAccess(false);
                   setShowDisdetta(false);
-                  setShowPrime(false);
+                  setIsDisdettaPending(true);
+                  inviaRichiesta("Amo dobbiamo parlare... non sei tu davvero, sono io...");
                 }}
                 className="w-full px-6 py-3 bg-transparent border border-red-500/50 rounded-full text-red-400 font-semibold hover:bg-red-500/10 transition-all duration-300 cursor-pointer text-sm"
               >
@@ -798,7 +797,15 @@ export default function Home() {
 
             {/* Pulsante chiudi */}
             <button
-              onClick={() => setShowRichiesta(false)}
+              onClick={() => {
+                setShowRichiesta(false);
+                if (isDisdettaPending) {
+                  localStorage.removeItem('ricciolinoPrimeAccess');
+                  setHasFirstAccess(false);
+                  setShowPrime(false);
+                  setIsDisdettaPending(false);
+                }
+              }}
               className="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full text-white font-semibold hover:scale-105 transition-all duration-300 shadow-lg shadow-green-500/30 cursor-pointer"
             >
               OK
